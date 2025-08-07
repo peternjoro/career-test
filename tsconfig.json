@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "module": "CommonJS",
+        "strict": true,
+        "esModuleInterop": true,
+        "noEmit": true,
+        "sourceMap": true,
+        "allowImportingTsExtensions": true,
+        "types": ["node"], // Add types for Node.js and Jest
+        "rootDir": "./src",
+        "moduleResolution": "node10",
+        "outDir": "./dist" // Ensure module resolution is set to node
+    },
+    "include": ["src/**/*.ts", "tests/**/*.ts","requests/**/*.ts"], // Include source and test files
+    "exclude": ["node_modules"] // Exclude node_modules
+}

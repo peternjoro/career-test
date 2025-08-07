@@ -1,0 +1,36 @@
+{
+  "name": "career-test",
+  "version": "1.0.0",
+  "main": "dist/server-start.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "cross-env NODE_ENV=production tsx src/server-start.ts",
+    "dev-org": "cross-env NODE_ENV=development tsx src/server-start.ts",
+    "dev": "nodemon --exec ts-node src/server-start.ts",
+    "test": "node --test --loader tsx ./**/*.test.ts",
+    "generate-openapi": "tsx ./api/generateOpenApi.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@apidevtools/swagger-parser": "^10.1.0",
+    "@fastify/autoload": "^6.3.1",
+    "@fastify/swagger": "^9.2.0",
+    "@fastify/swagger-ui": "^5.1.0",
+    "@fastify/type-provider-typebox": "^5.0.1",
+    "@sinclair/typebox": "^0.33.22",
+    "cross-env": "^7.0.3",
+    "dotenv": "^17.2.1",
+    "fastify": "^5.1.0",
+    "i": "^0.3.7",
+    "npm": "^11.5.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.9",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2"
+  }
+}
