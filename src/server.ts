@@ -1,5 +1,3 @@
-//import path from "path";
-//import fs from "fs-extra";
 import fastify from "fastify";
 import { FastifyReply, FastifyRequest } from "fastify";
 import compress from "@fastify/compress";
