@@ -1,6 +1,3 @@
-import dotenv from "dotenv";
-
-dotenv.config();
 
 const Config = {
     SVR_PORT: process.env.SVR_PORT || 2000,

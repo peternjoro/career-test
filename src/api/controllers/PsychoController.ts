@@ -1,5 +1,5 @@
 import { getRandomNumber, quizArrayDifference, shuffleArray } from "../../lib/utils";
-import { PsychometricTestQns, PsychometricTestQuizes } from "../../lib/data/psycho-test";
+import { PsychometricTestQnsv2, PsychometricTestQuizes } from "../../lib/data/psycho-test";
 import {
     CacheTestResult,
     INT_CODE_Type,
@@ -7,19 +7,25 @@ import {
     NextQuizType,
     PsychoTestAnswerRequest,
     Qnsype,
-    RIASECResult
+    RIASECResultV1
 } from "../../types/psycho.test";
 import { PsychoTestCache } from "../../lib/cache/psycho-test";
 
 const TestCache = new PsychoTestCache();
 
 
-type RIASECResultsType = Record<INT_CODE_Type, RIASECResult>;
+type RIASECResultsType = Record<INT_CODE_Type, RIASECResultV1>;
+
+type TestResultsType = {
+    success: boolean;
+    message: string;
+    testResults: CacheTestResult[] | null;
+}
 
 export class PsychoController
 {
     private static instance:PsychoController;
-    private qsns = PsychometricTestQns;
+    private qsns = PsychometricTestQnsv2;
     private quizes:Array<number> = PsychometricTestQuizes();
 
     constructor(){
@@ -61,15 +67,10 @@ export class PsychoController
 
     public nextQuiz = (userId:string):NextQuizType => {
         //taken quizes so far
-        //console.log(`----------`);
         const answeredQuizs = [...TestCache.getAnsweredQuizs(userId)];
-        //console.log(`[answeredQuizs] =>`,answeredQuizs);
-        const answeredRslt = TestCache.getTestResults(userId);
-        //console.log(`[answeredRslt] =>`,answeredRslt);
         const unAnsweredQuizs = quizArrayDifference(this.quizes,answeredQuizs);
-        //console.log(`[unAnsweredQuizs] =>`,unAnsweredQuizs);
         if(unAnsweredQuizs.length == 0){
-            return { endOfTest: true, qsnRslt: null }
+            return { endOfTest:true, qsnRslt:null }
         }
 
         const shaffledQuizes = shuffleArray(unAnsweredQuizs);
@@ -78,47 +79,68 @@ export class PsychoController
         return { endOfTest: false, qsnRslt }
     }
 
-    public testResults = (userId:string) => {
-        return TestCache.getTestResults(userId);
+    public testResults = (userId:string): TestResultsType => {
+        let results = { success:false, message:'No test found',testResults:null }
+        
+        const answeredQuizs = TestCache.getAnsweredQuizs(userId);
+        if(answeredQuizs.length == 0){
+            return results;
+        }
+
+        //check that test is fully completed
+        if(answeredQuizs.length != this.quizes.length){
+            results.message = "Test not complete";
+            return results;
+        }
+
+        const rslts = TestCache.getTestResults(userId);
+        if(!rslts){
+            results.message = "No test found";
+            return results;
+        }
+
+        return { success:true, message:'success', testResults:rslts }
     }
 
     public analyzeResults = (userId:string,results:CacheTestResult[]) => {
-        const resultMap = new Map<INT_CODE_Type,RIASECResult>();
+        //const resultMap = new Map<INT_CODE_Type,RIASECResult>();
+        const resultMap = new Map<INT_CODE_Type,number>();
         for (let i = 0; i < results.length; i++){
             const obj = results[i];
             const code = obj.INT_CODE;
-            let postve = false;
-            let negtve = false;
-            if(obj.ans == "Agree") postve = true;
-            if(obj.ans == "Disagree") negtve = true;
+            const score = obj.score;
             if(resultMap.has(code)){
-                const curRslts = resultMap.get(code);
-                if(curRslts){
-                    if(postve) curRslts.positive++;
-                    if(negtve) curRslts.negative++;
-                    resultMap.set(code,curRslts);
+                const curScore = resultMap.get(code);
+                if(curScore != undefined){
+                    if(score > 0){
+                        resultMap.set(code,(curScore + score));
+                    }
                 }
             }
             else {
-                resultMap.set(code,{
-                    positive: postve ? 1 : 0,
-                    negative: negtve ? 1 : 0
-                });
+                resultMap.set(code,score);
             }
         }
+        //const rslts = Array.from(resultMap);
+        //const rslts = Object.fromEntries(resultMap);
+        //console.log(`[rslts] =>`,rslts);
 
         let netScore:NetScore[] = [];
         if(resultMap.size > 0){
-            //find the net score, positive - negative for each code
+            const totalCodeScore = 40;
+            //find the percentage score
             for (const [key, value] of resultMap) {
+                const perc = (value/totalCodeScore) * 100;
                 netScore.push({
                     code: key,
-                    score: value.positive - value.negative
+                    score: value,
+                    perc: Math.round(perc * 10) / 10
                 })
             }
             //sort scores in descending order
             netScore.sort((a, b) => b.score - a.score);
         }
+        TestCache.clearResults(userId);
 
         return netScore;
     }

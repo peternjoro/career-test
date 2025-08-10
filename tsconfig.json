@@ -2,16 +2,16 @@
     "compilerOptions": {
         "target": "esnext",
         "module": "CommonJS",
-        "strict": true,
-        "esModuleInterop": true,
-        "noEmit": true,
-        "sourceMap": true,
-        "allowImportingTsExtensions": true,
-        "types": ["node"], // Add types for Node.js and Jest
         "rootDir": "./src",
         "moduleResolution": "node10",
+        "strict": true,
+        "esModuleInterop": true,
+        "noEmit": false, //must be set to false to generate the dist folder during build
+        "sourceMap": true,
+        //"allowImportingTsExtensions": true,
+        "types": ["node"], // Add types for Node.js and Jest
         "outDir": "./dist" // Ensure module resolution is set to node
     },
     "include": ["src/**/*.ts", "tests/**/*.ts","requests/**/*.ts"], // Include source and test files
-    "exclude": ["node_modules"] // Exclude node_modules
+    "exclude": ["*.dev.ts","node_modules"] // Exclude node_modules
 }

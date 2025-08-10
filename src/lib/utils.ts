@@ -15,3 +15,11 @@ export const shuffleArray = (array:Array<number>) => {
 export const quizArrayDifference = (quizesArray:Array<number>,takenQuizes:Array<number>) => {
     return quizesArray.filter(item => !takenQuizes.includes(item));
 }
+
+export const lowercase = (str:string) => {
+    let results = str;
+    if(str && str.length > 0){
+        results = (str.trim()).toLowerCase();
+    }
+    return results;
+}

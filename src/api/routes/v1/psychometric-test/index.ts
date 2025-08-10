@@ -2,7 +2,8 @@ import { FastifyPluginAsync } from "fastify";
 import {
   startPsychometricTest,
   patchPsychometricTestAnswer,
-  psychometricTestResults
+  psychometricTestResults,
+  RIASECResultCodeMapping
 } from "../../../routeHandlers/psychoTest";
 import { PsychoTestSchema, PsychoTestAnswerSchema, UserIDQueryParam } from "../../../../types/psycho.test";
 
@@ -14,7 +15,7 @@ const routes:FastifyPluginAsync = async fastify => {
       description: "Take a Psychometric Test",
       body: PsychoTestSchema
     },
-    //preHandler:
+    preHandler: fastify.authenticate,
     handler: startPsychometricTest
   })
 
@@ -26,7 +27,7 @@ const routes:FastifyPluginAsync = async fastify => {
         params: UserIDQueryParam,
         body: PsychoTestAnswerSchema
     },
-    //preHandler:
+    preHandler: fastify.authenticate,
     handler: patchPsychometricTestAnswer
   })
 
@@ -37,11 +38,20 @@ const routes:FastifyPluginAsync = async fastify => {
       description: "Test Results",
       params: UserIDQueryParam
     },
-    //preHandler:
+    preHandler: fastify.authenticate,
     handler: psychometricTestResults
   })
 
-  //*default route handler - for all unmatched routes
+  fastify.get('/riasec_result_code_mapping',{
+    schema: {
+      tags: ["Psycho Test"],
+      description: "RIASEC results code mapping"
+    },
+    preHandler: fastify.authenticate,
+    handler: RIASECResultCodeMapping
+  })
+
+  //*default route handler - for all unmatched routes in this block
   fastify.get("/", async (req, res) => {
     res.code(200).send({ success:true, message:"Take a Psychometric Test" });
   })

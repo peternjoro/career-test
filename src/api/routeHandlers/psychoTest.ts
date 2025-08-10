@@ -7,8 +7,10 @@ import {
     UserIDQueryParamType
 } from "../../types/psycho.test";
 import { PsychoController } from "../controllers/PsychoController";
-import { SampleResults } from "../../lib/data/psycho-test";
+import { PsychometricTestQnsv2AnswerScore, RIASECResultsMap, SampleResults } from "../../lib/data/psycho-test";
 
+
+const ansOptions = [...PsychometricTestQnsv2AnswerScore.keys()];
 
 const Controller = new PsychoController();
 
@@ -22,7 +24,7 @@ const defaultQuizResponse:PsychoQuizResponse = {
         endpoint: '',
         request_body: {
             qsn: 0,
-            ans: 'Agree or Disagree'
+            ans: ansOptions
         }
     }
 }
@@ -91,17 +93,42 @@ export async function psychometricTestResults(
     const { id } = req.params;
 
     const results = Controller.testResults(id);
+    let message = 'User has not taken a test';
     if(!results){
         const startTest = `${Config.API_BASE_URL}/v1/psychometric-test/start`;
         return reply.code(200).send({
             success: false,
-            message: 'User has not taken a test',
+            message,
             startTestUrl: startTest
         })
     }
 
-    const rslts = Controller.analyzeResults(id,SampleResults);
-    //Object.fromEntries(rslts)
+    if(!results.success){
+        return reply.code(400).send({
+            success: false,
+            message:results.message
+        })
+    }
 
-    return reply.code(200).send({ success:true, results:rslts })
+    const testResults = results.testResults;
+    if(!testResults){
+        return reply.code(400).send({
+            success: false,
+            message: "No test found"
+        })
+    }
+
+    const rslts = Controller.analyzeResults(id,testResults);
+
+    //Object.fromEntries(rslts)
+    message = 'Test results found';
+
+    return reply.code(200).send({ success:true, message, results:rslts })
+}
+
+export const RIASECResultCodeMapping = (req: FastifyRequest, reply:FastifyReply) => {
+
+    const codeMapping = RIASECResultsMap;
+
+    return reply.code(200).send({ success:true, message: "success", result_code_mapping:codeMapping })
 }

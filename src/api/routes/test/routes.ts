@@ -8,10 +8,9 @@ import {
 import { ErrorResponse, ErrorResponseSchema } from "../../../types/ErrorResponse";
 
 const routes: FastifyPluginAsync = async (fastify) => {
-  fastify.get(
-    "/",
-    {
+  fastify.get("/",{
       schema: {
+        hide:true,
         tags: ["Test"],
         description: "Welcome endpoint",
         response: {
@@ -37,10 +36,9 @@ const routes: FastifyPluginAsync = async (fastify) => {
   fastify.post<{
     Body: ExampleRequest;
     Reply: ExampleResponse | ErrorResponse;
-  }>(
-    "/example",
-    {
+  }>("/example",{
       schema: {
+        hide:true,
         tags: ["Test"],
         description: "Example endpoint",
         body: ExampleRequestSchema,

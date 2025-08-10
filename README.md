@@ -1,4 +1,4 @@
-# Fastify TypeScript Template
+# Career Test API
 
 A modern, type-safe API template using Fastify, TypeBox, and Swagger.
 

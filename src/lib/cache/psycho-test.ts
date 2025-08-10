@@ -1,7 +1,8 @@
 import { CacheTestResult, INT_CODE_Type } from "../../types/psycho.test";
-import { PsychoQuizCode } from "../data/psycho-test";
+import { PsychometricTestQnsv2AnswerScore, PsychoQuizCode } from "../data/psycho-test";
+import { lowercase } from "../utils";
 
-type ANS_TYPE = "Agree" | "Disagree";
+type ANS_TYPE = "Strongly Dislike" | "Dislike" | "Unsure" | "Like" | "Strongly Like";
 
 type TestResult = {
     qsn: number;
@@ -29,23 +30,24 @@ export class PsychoTestCache
     }
 
     //public recordExixts
-    private updateTestResult = (userId:string,testResults:CacheTestResult[],result:TestResult,code:INT_CODE_Type):void => {
+    private updateTestResult = (userId:string,testResults:CacheTestResult[],result:TestResult,code:INT_CODE_Type,score:number):void => {
         const qsn = result.qsn;
         const ans = result.ans;
         if(qsn > 0 && ans){
             const userIndex = this.cache.findIndex(obj => obj.userId == userId);
             if(userIndex != -1){
-                console.log(`user results found ...`);
+                //console.log(`User results found ...`);
                 let quizFound = false;
                 const updatedResults = [...testResults].map(rslt => {
                     if(rslt.qsn == qsn){
                         quizFound = true;
-                        return {...rslt, ans }
+                        return {...rslt, ans, score }
                     }
                     return rslt;
                 });
                 if(!quizFound){
-                    const quizRslts = {...result, INT_CODE:code}
+                    //console.log(`Updating user result ...`);
+                    const quizRslts = {...result, INT_CODE:code, score }
                     updatedResults.push(quizRslts);
                 }
 
@@ -61,15 +63,17 @@ export class PsychoTestCache
         const qnsNo = result.qsn;
         const userTestResults = this.getTestResults(userId);
         const code = PsychoQuizCode(qnsNo);
-        if(code){
+        const score = PsychometricTestQnsv2AnswerScore.get(lowercase(result.ans));
+        if(code && score != undefined){
             if(userTestResults && userTestResults.length > 0){
                 //update ans
-                this.updateTestResult(userId,userTestResults,result,code);
+                this.updateTestResult(userId,userTestResults,result,code,score);
             }
             else {
                 const initialRslts = [{
                     ...result,
-                    INT_CODE: code
+                    INT_CODE: code,
+                    score,
                 }]
                 //set user
                 this.cache.push({
@@ -103,5 +107,11 @@ export class PsychoTestCache
             return results.answeredQuizs;
         }
         return [];
+    }
+
+    public clearResults = (userId:string) => {
+        //clear user test cache
+        const updatedCache = this.cache.filter(obj => obj.userId != userId);
+        this.cache = updatedCache;
     }
 }

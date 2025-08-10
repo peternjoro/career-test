@@ -1,5 +1,5 @@
 import Config from "./config";
-import { buildServer } from "./server";
+import { buildServer } from "./serverorg";
 
 const start = async () => {
   const server = await buildServer();
@@ -11,7 +11,7 @@ const start = async () => {
     await server.listen({ port: parseInt(port), host: "0.0.0.0" }); // listen on all interfaces, this will make your server accessible from other devices
 
     console.log(`Server is running on ${base_url}`);
-    console.log(`API documentation available at ${base_url}/docs`);
+    //console.log(`API documentation available at ${base_url}/docs`);
   }
   catch (err) {
     server.log.error(err);

@@ -1,9 +1,12 @@
-import { Type as T, Static, Null } from "@sinclair/typebox";
+import { Type as T, Static } from "@sinclair/typebox";
 
 
 export const QuizAnswer = T.Union([
-  T.Literal('Agree'),
-  T.Literal('Disagree')
+  T.Literal('Strongly Dislike'),
+  T.Literal('Dislike'),
+  T.Literal('Unsure'),
+  T.Literal('Like'),
+  T.Literal('Strongly Like')
 ]);
 
 export const INT_CODE = T.Union([
@@ -19,26 +22,29 @@ export type INT_CODE_Type = Static<typeof INT_CODE>;
 export const QnsSchema = T.Object({
   qsn: T.Number(),
   text: T.String(),
-  INT_CODE: INT_CODE
+  INT_CODE: INT_CODE,
+  score: T.Optional(T.Number())
 })
 export type Qnsype = Static<typeof QnsSchema>;
 
 export const CacheTestResultSchema = T.Object({
     qsn: T.Number(),
     ans: QuizAnswer,
-    INT_CODE: INT_CODE
+    INT_CODE: INT_CODE,
+    score: T.Number()
 })
 export type CacheTestResult = Static<typeof CacheTestResultSchema>;
 
-export const RIASECResultSchema = T.Object({
+export const RIASECResultv1Schema = T.Object({
   positive: T.Number(),
   negative: T.Number()
 })
-export type RIASECResult = Static<typeof RIASECResultSchema>;
+export type RIASECResultV1 = Static<typeof RIASECResultv1Schema>;
 
 export const NetScoreSchema = T.Object({
   code: INT_CODE,
-  score:T.Number()
+  score: T.Number(),
+  perc: T.Number()
 })
 export type NetScore = Static<typeof NetScoreSchema>;
 
@@ -68,7 +74,7 @@ export type PsychoTestAnswerRequest = Static<typeof PsychoTestAnswerSchema>;
 
 const QuizAnswerRequestSchema = T.Object({
   qsn: T.Number(),
-  ans: T.String()
+  ans: T.Array(T.String())
 });
 
 const PsychoQuizAnswerFormatSchema = T.Object({

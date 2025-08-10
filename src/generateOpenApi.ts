@@ -1,5 +1,5 @@
 import { writeFile } from "fs/promises";
-import { buildServer } from "./server";
+import { buildServer } from "./serverorg";
 
 export async function generateOpenApiJson(outputPath?: string) {
   const server = await buildServer();
