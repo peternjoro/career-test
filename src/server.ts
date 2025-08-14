@@ -5,6 +5,7 @@ import cors from "@fastify/cors";
 import 'dotenv/config';
 // for adding security headers
 import Helmet from "@fastify/helmet";
+import Config from "./config";
 
 
 //* adding authenticate property to FastifyInstance
@@ -13,6 +14,9 @@ declare module 'fastify' {
         authenticate: any
     }
 }
+
+const PORT = Config.SVR_PORT;
+const apiKey = Config.API_KEY;
 
 /**
  * For https, Consider the trustProxy setting for fastify. If your app will be deployed behind a proxy such as 
@@ -43,7 +47,7 @@ app.register(Helmet, {
             scriptSrc: [
                 `'self'`,
                 `https: 'unsafe-inline'`,
-                'http://localhost:2000'
+                `http://localhost:${PORT}`
             ],
             fontSrc: [
                 `'self'`,
@@ -81,7 +85,7 @@ app.decorate('authenticate', async (req: FastifyRequest, reply: FastifyReply) =>
         return reply.status(401).send({ success:false, message:'Authentication required' })
     }
     try {
-        if(api_key != process.env.API_KEY){
+        if(api_key != apiKey){
             return reply.status(401).send({ success:false, message:'Authentication required' })
         }
     }
@@ -131,7 +135,7 @@ listeners.forEach((signal) => {
 })
 
 // start server
-app.listen({ port: Number(process.env.SVR_PORT || "2000"), host: "0.0.0.0" }, (err: any, address: string) => {
+app.listen({ port: Number(PORT), host: "0.0.0.0" }, (err: any, address: string) => {
     if (err) {
         console.log(err);
         console.error(err);
