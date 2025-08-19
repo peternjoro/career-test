@@ -7,7 +7,7 @@ import swaggerUi from "@fastify/swagger-ui";
 import Config from "./config";
 
 
-const app: FastifyPluginAsync = async (fastify): Promise<void> => {
+const app: FastifyPluginAsync = async (fastify,opts): Promise<void> => {
 
     dotenv.config();
 
@@ -37,7 +37,7 @@ const app: FastifyPluginAsync = async (fastify): Promise<void> => {
     // This loads all plugins defined in routes
     fastify.register(AutoLoad, {
         dir: join(__dirname, "api/routes"),
-        //options: Object.assign({ prefix: '/server' }, opts), // Prefix all routes with '/server'
+        options: Object.assign({ prefix: '/testserver' }, opts), // Prefix all routes with '/testserver'
     });
 }
 

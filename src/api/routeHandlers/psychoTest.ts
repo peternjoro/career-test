@@ -45,7 +45,7 @@ export async function startPsychometricTest(
     const question = startingQuiz.text;
     const qnsNo = startingQuiz.qsn;
 
-    const responsePath = `${Config.API_BASE_URL}/v1/psychometric-test/${userId}/answer`;
+    const responsePath = `${Config.API_BASE_URL}/testserver/v1/psychometric-test/${userId}/answer`;
 
     const resp = {...defaultQuizResponse};
     resp.question = question;
@@ -65,7 +65,7 @@ export async function patchPsychometricTestAnswer(
     const nextQuizResp = Controller.nextQuiz(id);
 
     if(nextQuizResp.endOfTest){
-        const resultsUrl = `${Config.API_BASE_URL}/v1/psychometric-test/${id}/results`;
+        const resultsUrl = `${Config.API_BASE_URL}/testserver/v1/psychometric-test/${id}/results`;
         return reply.code(200).send({
             success: true,
             message: 'success',
@@ -77,7 +77,7 @@ export async function patchPsychometricTestAnswer(
     const question = nextQuizResp.qsnRslt?.text??'';
     const qnsNo = nextQuizResp.qsnRslt?.qsn??0;
 
-    const responsePath = `${Config.API_BASE_URL}/v1/psychometric-test/${id}/answer`;
+    const responsePath = `${Config.API_BASE_URL}/testserver/v1/psychometric-test/${id}/answer`;
 
     const resp = {...defaultQuizResponse};
     resp.question = question;
@@ -95,7 +95,7 @@ export async function psychometricTestResults(
     const results = Controller.testResults(id);
     let message = 'User has not taken a test';
     if(!results){
-        const startTest = `${Config.API_BASE_URL}/v1/psychometric-test/start`;
+        const startTest = `${Config.API_BASE_URL}/testserver/v1/psychometric-test/start`;
         return reply.code(200).send({
             success: false,
             message,
